@@ -1,0 +1,19 @@
+name: Audit
+
+on:
+  push:
+    paths:
+      - '**/Cargo.lock'
+      - '**/audit.toml'
+      - '**/deny.toml'
+  pull_request:
+    paths: 
+      - '**/Cargo.lock'
+      - '**/audit.toml'
+      - '**/deny.toml'
+  workflow_dispatch:
+
+jobs:
+  call_shared:
+    uses: eventrica/.github/.github/workflows/audit.yml@main
+    secrets: inherit

@@ -1,0 +1,11 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  call_shared:
+    uses: eventrica/.github/.github/workflows/coverage.yml@main
+    secrets: inherit
