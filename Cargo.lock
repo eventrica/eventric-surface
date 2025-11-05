@@ -5,3 +5,11 @@ version = 4
 [[package]]
 name = "eventric-surface"
 version = "0.1.0"
+
+[[patch.unused]]
+name = "eventric-core"
+version = "0.1.0"
+
+[[patch.unused]]
+name = "eventric-stream"
+version = "0.1.0"
