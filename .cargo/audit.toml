@@ -1,0 +1,11 @@
+# Configuration for cargo-audit
+# See: https://github.com/rustsec/rustsec/blob/main/cargo-audit/audit.toml.example
+
+[advisories]
+ignore                 = []               # advisory IDs to ignore e.g. ["RUSTSEC-2019-0001", ...]
+informational_warnings = ["unmaintained"] # warn for categories of informational advisories
+severity_threshold     = "low"            # CVSS severity ("none", "low", "medium", "high", "critical")
+
+[output]
+deny  = ["unmaintained", "yanked"]
+quiet = false
