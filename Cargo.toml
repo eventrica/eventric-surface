@@ -5,7 +5,7 @@ debug = true
 debug = true
 
 [workspace]
-members  = ["crates/*"]
+members  = ["crates/*", "examples/eventric-surface-examples"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -13,6 +13,7 @@ assertables       = { version = "9" }
 derive_more       = { version = "2", features = ["full"] }
 eventric-core     = { git = "https://github.com/eventrica/eventric-core.git" }
 eventric-stream   = { git = "https://github.com/eventrica/eventric-stream.git" }
+eventric-surface  = { path = "crates/eventric-surface" }
 fancy_constructor = { version = "2" }
 thiserror         = { version = "2" }
 

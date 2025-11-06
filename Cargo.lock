@@ -189,6 +189,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "eventric-surface-examples"
+version = "0.1.0"
+dependencies = [
+ "eventric-core",
+ "eventric-stream",
+ "eventric-surface",
+]
+
+[[package]]
 name = "fancy_constructor"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

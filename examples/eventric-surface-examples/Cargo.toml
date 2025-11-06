@@ -1,0 +1,19 @@
+[dependencies]
+eventric-core.workspace    = true
+eventric-stream.workspace  = true
+eventric-surface.workspace = true
+
+[lints]
+workspace = true
+
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "Eventric Surface Examples"
+edition.workspace    = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "eventric-surface-examples"
+readme.workspace     = true
+repository.workspace = true
+version.workspace    = true
