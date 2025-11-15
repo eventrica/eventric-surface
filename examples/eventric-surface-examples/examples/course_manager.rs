@@ -6,10 +6,7 @@
 #![feature(once_cell_try)]
 #![feature(if_let_guard)]
 
-use std::{
-    any::Any,
-    sync::OnceLock,
-};
+use std::any::Any;
 
 use derive_more::Debug;
 use eventric_stream::{
@@ -17,7 +14,6 @@ use eventric_stream::{
     event::{
         Data,
         EphemeralEvent,
-        Identifier,
         PersistentEvent,
         Tag,
         Version,
@@ -32,13 +28,16 @@ use eventric_stream::{
         },
     },
 };
+use eventric_surface::event::{
+    Event,
+    Identified as _,
+    Tagged as _,
+};
 use eventric_surface_examples::{
     Decision,
     DeserializedPersistentEvent,
-    GetIdentifier,
     GetQuery,
     GetSpecifier as _,
-    GetTags,
     Update,
 };
 use fancy_constructor::new;
@@ -55,8 +54,6 @@ use serde::{
 // -------------------------------------------------------------------------------------------------
 
 // Theoretically Generated...
-
-static COURSE_REGISTERED_IDENTIFIER: OnceLock<Identifier> = OnceLock::new();
 
 impl TryFrom<CourseRegistered> for EphemeralEvent {
     type Error = Error;
@@ -78,20 +75,6 @@ impl TryFrom<&PersistentEvent> for CourseRegistered {
 
     fn try_from(event: &PersistentEvent) -> Result<Self, Self::Error> {
         serde_json::from_slice(event.data().as_ref()).map_err(|_| Error::data("deserialization"))
-    }
-}
-
-impl GetIdentifier for CourseRegistered {
-    fn identifier() -> Result<&'static Identifier, Error> {
-        COURSE_REGISTERED_IDENTIFIER.get_or_try_init(|| Identifier::new("course_registered"))
-    }
-}
-
-impl GetTags for CourseRegistered {
-    fn tags(&self) -> Result<Vec<Tag>, Error> {
-        [Tag::new(format!("course_id:{}", self.id))]
-            .into_iter()
-            .collect()
     }
 }
 
@@ -135,7 +118,8 @@ impl<'a> Decision<'a> for CourseExists {
 
 // Events
 
-#[derive(new, Debug, Deserialize, Serialize)]
+#[derive(new, Debug, Deserialize, Event, Serialize)]
+#[event(identifier(course_registered), tags(course_id(id)))]
 pub struct CourseRegistered {
     #[new(into)]
     pub id: String,
@@ -174,7 +158,9 @@ impl Update<'_> for CourseExists {
 // Example...
 
 pub fn main() -> Result<(), Error> {
-    let mut stream = Stream::builder("./temp").temporary(false).open()?;
+    let mut stream = Stream::builder(eventric_stream::temp_path())
+        .temporary(true)
+        .open()?;
 
     let course_id = "some_course";
 
@@ -189,7 +175,7 @@ pub fn main() -> Result<(), Error> {
 
     let mut position = None;
 
-    println!("running decision query");
+    println!("running decision query: {query:#?}");
 
     for event in stream.query(&condition, None) {
         let event = event?;
@@ -229,6 +215,8 @@ pub fn main() -> Result<(), Error> {
 
         let event = CourseRegistered::new(course_id, "My Course", 30);
         let event = event.try_into()?;
+
+        println!("appending event: {event:#?}");
 
         stream.append([&event], Some(&condition))?;
     }

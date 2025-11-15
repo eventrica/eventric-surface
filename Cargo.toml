@@ -9,13 +9,19 @@ members  = ["crates/*", "examples/eventric-surface-examples"]
 resolver = "2"
 
 [workspace.dependencies]
-assertables       = { version = "9" }
-derive_more       = { version = "2", features = ["full"] }
-eventric-core     = { git = "https://github.com/eventrica/eventric-core.git" }
-eventric-stream   = { git = "https://github.com/eventrica/eventric-stream.git" }
-eventric-surface  = { path = "crates/eventric-surface" }
-fancy_constructor = { version = "2" }
-thiserror         = { version = "2" }
+assertables             = { version = "9" }
+darling                 = { version = "0.21" }
+derive_more             = { version = "2", features = ["full"] }
+eventric-core           = { git = "https://github.com/eventrica/eventric-core.git" }
+eventric-stream         = { git = "https://github.com/eventrica/eventric-stream.git" }
+eventric-surface        = { path = "crates/eventric-surface" }
+eventric-surface-core   = { path = "crates/eventric-surface-core" }
+eventric-surface-macros = { path = "crates/eventric-surface-macros" }
+fancy_constructor       = { version = "2" }
+proc-macro2             = { version = "1" }
+quote                   = { version = "1" }
+syn                     = { version = "2" }
+thiserror               = { version = "2" }
 
 [workspace.lints.clippy]
 cargo       = "warn"

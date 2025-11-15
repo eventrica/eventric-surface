@@ -11,13 +11,12 @@ use std::any::Any;
 use eventric_stream::{
     error::Error,
     event::{
-        Identifier,
         PersistentEvent,
         Specifier,
-        Tag,
     },
     stream::query::Query,
 };
+use eventric_surface::event::Identified;
 use fancy_constructor::new;
 
 #[derive(new, Debug)]
@@ -29,7 +28,7 @@ pub struct DeserializedPersistentEvent {
 impl DeserializedPersistentEvent {
     pub fn deserialize_as<T>(&self) -> Result<Option<&T>, Error>
     where
-        T: GetIdentifier + 'static,
+        T: Identified + 'static,
     {
         if self.event.identifier() != T::identifier()? {
             return Ok(None);
@@ -52,16 +51,8 @@ pub trait Update<'a>: Decision<'a> {
     fn update(&mut self, event: Self::Event);
 }
 
-pub trait GetIdentifier {
-    fn identifier() -> Result<&'static Identifier, Error>;
-}
-
 pub trait GetQuery {
     fn query(&self) -> Result<Query, Error>;
-}
-
-pub trait GetTags {
-    fn tags(&self) -> Result<Vec<Tag>, Error>;
 }
 
 // Temporary Convenience Traits
@@ -72,7 +63,7 @@ pub trait GetSpecifier {
 
 impl<T> GetSpecifier for T
 where
-    T: GetIdentifier,
+    T: Identified,
 {
     fn specifier() -> Result<Specifier, Error> {
         T::identifier().cloned().map(Specifier::new)

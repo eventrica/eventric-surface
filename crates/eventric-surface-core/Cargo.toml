@@ -1,8 +1,9 @@
 [dependencies]
-eventric-core.workspace           = true
-eventric-stream.workspace         = true
-eventric-surface-core.workspace   = true
-eventric-surface-macros.workspace = true
+darling.workspace         = true
+eventric-stream.workspace = true
+proc-macro2.workspace     = true
+quote.workspace           = true
+syn.workspace             = true
 
 [lints]
 workspace = true
@@ -10,11 +11,11 @@ workspace = true
 [package]
 authors.workspace    = true
 categories.workspace = true
-description          = "Eventric Surface"
+description          = "Eventric Surface Core"
 edition.workspace    = true
 keywords.workspace   = true
 license.workspace    = true
-name                 = "eventric-surface"
+name                 = "eventric-surface-core"
 readme.workspace     = true
 repository.workspace = true
 version.workspace    = true

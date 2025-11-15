@@ -1,16 +1,13 @@
 #![allow(clippy::multiple_crate_versions)]
 
-#[allow(dead_code)]
-fn testable() -> bool {
-    true
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::testable;
-
-    #[test]
-    fn temp() {
-        assert!(testable());
-    }
+pub mod event {
+    pub use eventric_surface_core::event::{
+        Identified,
+        Tagged,
+    };
+    pub use eventric_surface_macros::{
+        Event,
+        Identified,
+        Tagged,
+    };
 }
