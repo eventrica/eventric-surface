@@ -8,6 +8,7 @@ use darling::{
 };
 use eventric_stream::event;
 use proc_macro2::{
+    Span,
     TokenStream,
     TokenTree,
 };
@@ -18,6 +19,7 @@ use quote::{
 };
 use syn::{
     DeriveInput,
+    ExprClosure,
     Ident,
     Meta,
     MetaList,
@@ -155,21 +157,39 @@ impl Tagged {
         let tag_type = quote! { eventric_stream::event::Tag };
         let error_type = quote! { eventric_stream::error::Error };
 
-        let mut capacity = 0usize;
+        let identity_fn = quote! { std::convert::identity };
+        let cow_type = quote! { std::borrow::Cow };
 
-        let body = tags
+        let mut tags_count = 0usize;
+
+        let tags = tags
             .as_ref()
             .map(|tags| {
                 tags.iter()
                     .fold(TokenStream::new(), |mut tokens, (prefix, tags)| {
                         for tag in tags.as_ref() {
                             match tag {
+                                Tag::Expr(expr) => tokens.append_all(quote! {
+                                    {
+                                        let prefix = #prefix;
+                                        let value = #identity_fn::<for<'a> fn(&'a #ident) -> #cow_type<'a, _>>(#expr)(&self);
+                                        let tag = #tag_type::new(format!("{prefix}:{value}"))?;
+
+                                        tags.push(tag);
+                                    }
+                                }),
                                 Tag::Ident(ident) => tokens.append_all(quote! {
-                                    tags.push(#tag_type::new(format!("{}:{}", #prefix, &self.#ident))?);
+                                    {
+                                        let prefix = #prefix;
+                                        let value = &self.#ident;
+                                        let tag = #tag_type::new(format!("{prefix}:{value}"))?;
+
+                                        tags.push(tag);
+                                    }
                                 }),
                             }
 
-                            capacity += 1;
+                            tags_count += 1;
                         }
 
                         tokens
@@ -180,9 +200,9 @@ impl Tagged {
         quote! {
             impl eventric_surface::event::Tagged for #ident {
                 fn tags(&self) -> Result<Vec<#tag_type>, #error_type> {
-                    let mut tags = Vec::with_capacity(#capacity);
+                    let mut tags = Vec::with_capacity(#tags_count);
 
-                    #body
+                    #tags
 
                     Ok(tags)
                 }
@@ -201,11 +221,25 @@ impl ToTokens for Tagged {
 
 #[derive(Debug)]
 pub enum Tag {
+    Expr(ExprClosure),
     Ident(Ident),
 }
 
 impl Parse for Tag {
     fn parse(stream: ParseStream<'_>) -> syn::Result<Self> {
-        Ident::parse(stream).map(Self::Ident)
+        if let Ok(mut expr) = ExprClosure::parse(stream) {
+            let body = &expr.body;
+            let body = syn::parse(quote! { { #body }.into() }.into())?;
+
+            *expr.body = body;
+
+            return Ok(Self::Expr(expr));
+        }
+
+        if let Ok(ident) = Ident::parse(stream) {
+            return Ok(Self::Ident(ident));
+        }
+
+        Err(syn::Error::new(Span::call_site(), "Unexpected Tag Format"))
     }
 }
