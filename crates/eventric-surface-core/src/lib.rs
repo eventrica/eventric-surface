@@ -4,6 +4,11 @@
 #![allow(clippy::multiple_crate_versions)]
 #![allow(missing_docs)]
 
+pub mod error;
 pub mod event;
 pub mod macros;
 pub mod projection;
+
+// =================================================================================================
+// Eventric Surface Core
+// =================================================================================================

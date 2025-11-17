@@ -12,11 +12,8 @@ use derive_more::Debug;
 use eventric_stream::{
     error::Error,
     event::{
-        Data,
-        EphemeralEvent,
         PersistentEvent,
-        Tag,
-        Version,
+        tag,
     },
     stream::{
         Stream,
@@ -29,9 +26,10 @@ use eventric_stream::{
     },
 };
 use eventric_surface::event::{
+    Codec,
     Event,
     Identified as _,
-    Tagged as _,
+    json,
 };
 use eventric_surface_examples::{
     Decision,
@@ -55,29 +53,6 @@ use serde::{
 
 // Theoretically Generated...
 
-impl TryFrom<CourseRegistered> for EphemeralEvent {
-    type Error = Error;
-
-    fn try_from(event: CourseRegistered) -> Result<Self, Self::Error> {
-        let data = serde_json::to_vec(&event).map_err(|_| Error::data("serialization"))?;
-        let data = Data::new(data)?;
-
-        let identifier = CourseRegistered::identifier().cloned()?;
-        let tags = event.tags()?;
-        let version = Version::default();
-
-        Ok(EphemeralEvent::new(data, identifier, tags, version))
-    }
-}
-
-impl TryFrom<&PersistentEvent> for CourseRegistered {
-    type Error = Error;
-
-    fn try_from(event: &PersistentEvent) -> Result<Self, Self::Error> {
-        serde_json::from_slice(event.data().as_ref()).map_err(|_| Error::data("deserialization"))
-    }
-}
-
 #[derive(Debug)]
 pub enum CourseExistsEvent<'a> {
     CourseRegistered(&'a CourseRegistered),
@@ -86,10 +61,16 @@ pub enum CourseExistsEvent<'a> {
 impl<'a> Decision<'a> for CourseExists {
     type Event = CourseExistsEvent<'a>;
 
-    fn filter_deserialize(event: &'a PersistentEvent) -> Result<Option<Box<dyn Any>>, Error> {
+    fn filter_deserialize<C>(
+        codec: &C,
+        event: &'a PersistentEvent,
+    ) -> Result<Option<Box<dyn Any>>, Error>
+    where
+        C: Codec,
+    {
         let event = match event.identifier() {
             identifier if identifier == CourseRegistered::identifier()? => {
-                let event: CourseRegistered = event.try_into()?;
+                let event = codec.decode::<CourseRegistered>(event)?;
                 let event = Box::new(event) as Box<dyn Any>;
 
                 Some(event)
@@ -142,7 +123,7 @@ impl GetQuery for CourseExists {
     fn query(&self) -> Result<Query, Error> {
         Query::new([Selector::specifiers_and_tags(
             [CourseRegistered::specifier()?],
-            [Tag::new(format!("course_id:{}", self.id))?],
+            [tag!(course_id, self.id)?],
         )?])
     }
 }
@@ -150,7 +131,7 @@ impl GetQuery for CourseExists {
 impl Update<'_> for CourseExists {
     fn update(&mut self, event: Self::Event) {
         match event {
-            Self::Event::CourseRegistered(_event) => self.exists = true,
+            Self::Event::CourseRegistered(_) => self.exists = true,
         }
     }
 }
@@ -158,6 +139,8 @@ impl Update<'_> for CourseExists {
 // Example...
 
 pub fn main() -> Result<(), Error> {
+    let codec = json::Codec;
+
     let mut stream = Stream::builder(eventric_stream::temp_path())
         .temporary(true)
         .open()?;
@@ -182,7 +165,7 @@ pub fn main() -> Result<(), Error> {
 
         position = Some(*event.position());
 
-        if let Some(deserialized) = CourseExists::filter_deserialize(&event)? {
+        if let Some(deserialized) = CourseExists::filter_deserialize(&codec, &event)? {
             let event = DeserializedPersistentEvent::new(deserialized, event);
 
             if let Some(event) = CourseExists::filter_map(&event)? {
@@ -214,7 +197,7 @@ pub fn main() -> Result<(), Error> {
         println!("appending new events");
 
         let event = CourseRegistered::new(course_id, "My Course", 30);
-        let event = event.try_into()?;
+        let event = codec.encode(event)?;
 
         println!("appending event: {event:#?}");
 

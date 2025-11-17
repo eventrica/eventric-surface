@@ -51,8 +51,17 @@ impl Event {
     }
 }
 
+impl Event {
+    fn event(ident: &Ident) -> TokenStream {
+        quote! {
+            impl eventric_surface::event::Event for #ident {}
+        }
+    }
+}
+
 impl ToTokens for Event {
     fn to_tokens(&self, tokens: &mut TokenStream) {
+        tokens.append_all(Event::event(&self.ident));
         tokens.append_all(Identified::identifier(&self.ident, &self.identifier));
         tokens.append_all(Tagged::tags(&self.ident, self.tags.as_ref()));
     }

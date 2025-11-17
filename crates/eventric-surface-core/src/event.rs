@@ -1,4 +1,5 @@
-#![allow(clippy::needless_continue)]
+pub(crate) mod codec;
+pub(crate) mod macros;
 
 use eventric_stream::{
     error::Error,
@@ -7,12 +8,18 @@ use eventric_stream::{
         Tag,
     },
 };
-
-pub(crate) mod macros;
+use serde::{
+    Serialize,
+    de::DeserializeOwned,
+};
 
 // =================================================================================================
 // Event
 // =================================================================================================
+
+// Event
+
+pub trait Event: DeserializeOwned + Identified + Tagged + Serialize {}
 
 // Identified
 
@@ -25,3 +32,12 @@ pub trait Identified {
 pub trait Tagged {
     fn tags(&self) -> Result<Vec<Tag>, Error>;
 }
+
+// -------------------------------------------------------------------------------------------------
+
+// Re-Exports
+
+pub use self::codec::{
+    Codec,
+    JsonCodec,
+};

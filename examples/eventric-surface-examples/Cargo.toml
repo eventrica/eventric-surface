@@ -4,8 +4,8 @@ eventric-core.workspace     = true
 eventric-stream.workspace   = true
 eventric-surface.workspace  = true
 fancy_constructor.workspace = true
-serde                       = { version = "1", features = ["derive"] }
-serde_json                  = { version = "1" }
+serde.workspace             = true
+serde_json.workspace        = true
 
 [lints]
 workspace = true

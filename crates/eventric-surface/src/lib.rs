@@ -2,6 +2,8 @@
 
 pub mod event {
     pub use eventric_surface_core::event::{
+        Codec,
+        Event,
         Identified,
         Tagged,
     };
@@ -10,4 +12,8 @@ pub mod event {
         Identified,
         Tagged,
     };
+
+    pub mod json {
+        pub use eventric_surface_core::event::JsonCodec as Codec;
+    }
 }

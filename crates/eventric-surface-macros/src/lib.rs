@@ -1,7 +1,10 @@
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::missing_panics_doc)]
-#![allow(clippy::missing_safety_doc)]
+//! See the `eventric-surface` crate for full documentation, including
+//! crate-level documentation.
+
 #![allow(clippy::multiple_crate_versions)]
+#![deny(clippy::missing_errors_doc)]
+#![deny(clippy::missing_panics_doc)]
+#![deny(clippy::missing_safety_doc)]
 #![allow(missing_docs)]
 
 use eventric_surface_core::macros;
@@ -30,6 +33,8 @@ pub fn tagged(input: TokenStream) -> TokenStream {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+// Projection
 
 #[proc_macro_derive(Projection, attributes(projection))]
 pub fn projection(input: TokenStream) -> TokenStream {

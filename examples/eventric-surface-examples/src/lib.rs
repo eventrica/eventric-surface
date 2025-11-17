@@ -16,7 +16,10 @@ use eventric_stream::{
     },
     stream::query::Query,
 };
-use eventric_surface::event::Identified;
+use eventric_surface::event::{
+    Codec,
+    Identified,
+};
 use fancy_constructor::new;
 
 #[derive(new, Debug)]
@@ -43,7 +46,13 @@ impl DeserializedPersistentEvent {
 pub trait Decision<'a> {
     type Event;
 
-    fn filter_deserialize(event: &'a PersistentEvent) -> Result<Option<Box<dyn Any>>, Error>;
+    fn filter_deserialize<C>(
+        codec: &C,
+        event: &'a PersistentEvent,
+    ) -> Result<Option<Box<dyn Any>>, Error>
+    where
+        C: Codec;
+
     fn filter_map(event: &'a DeserializedPersistentEvent) -> Result<Option<Self::Event>, Error>;
 }
 
