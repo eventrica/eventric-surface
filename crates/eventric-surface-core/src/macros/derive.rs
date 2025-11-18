@@ -24,16 +24,19 @@ macro_rules! emit_impl_or_error {
 
 // Event
 
+#[doc(hidden)]
 #[must_use]
 pub fn event(input: &DeriveInput) -> TokenStream {
     emit_impl_or_error!(event::macros::Event::new(input))
 }
 
+#[doc(hidden)]
 #[must_use]
 pub fn identifier(input: &DeriveInput) -> TokenStream {
     emit_impl_or_error!(event::macros::Identified::new(input))
 }
 
+#[doc(hidden)]
 #[must_use]
 pub fn tagged(input: &DeriveInput) -> TokenStream {
     emit_impl_or_error!(event::macros::Tagged::new(input))
@@ -43,11 +46,13 @@ pub fn tagged(input: &DeriveInput) -> TokenStream {
 
 // Projection
 
+#[doc(hidden)]
 #[must_use]
 pub fn projection(input: &DeriveInput) -> TokenStream {
     emit_impl_or_error!(projection::macros::Projection::new(input))
 }
 
+#[doc(hidden)]
 #[must_use]
 pub fn query_source(input: &DeriveInput) -> TokenStream {
     emit_impl_or_error!(projection::macros::QuerySource::new(input))

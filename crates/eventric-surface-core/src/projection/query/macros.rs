@@ -45,7 +45,7 @@ impl ToTokens for IdentAndQuery<'_> {
             .iter()
             .map(|selector| IdentAndSelector(ident, selector));
 
-        let query_type = quote! {eventric_stream::stream::query::Query };
+        let query_type = quote! { eventric_stream::stream::query::Query };
 
         tokens.append_all(quote! {
             #query_type::new([#(#selector?),*])
