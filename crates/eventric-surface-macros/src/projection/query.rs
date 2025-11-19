@@ -35,7 +35,7 @@ use crate::{
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(query), supports(struct_named))]
-pub(crate) struct QueryDerive {
+pub struct QueryDerive {
     ident: Ident,
     #[darling(multiple)]
     select: Vec<SelectorDefinition>,
@@ -76,9 +76,9 @@ impl ToTokens for QueryDerive {
 // Query Definition
 
 #[derive(Debug, FromMeta)]
-pub(crate) struct QueryDefinition {
+pub struct QueryDefinition {
     #[darling(multiple)]
-    pub select: Vec<SelectorDefinition>,
+    select: Vec<SelectorDefinition>,
 }
 
 impl QueryDefinition {
@@ -92,6 +92,10 @@ impl QueryDefinition {
             .into_iter()
             .collect()
     }
+
+    pub fn selectors(&self) -> &Vec<SelectorDefinition> {
+        &self.select
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -99,7 +103,7 @@ impl QueryDefinition {
 // Selector Definition
 
 #[derive(Debug, FromMeta)]
-pub(crate) struct SelectorDefinition {
+pub struct SelectorDefinition {
     events: List<Path>,
     #[darling(map = "tag::map")]
     filter: Option<HashMap<Ident, List<TagDefinition>>>,
@@ -107,7 +111,7 @@ pub(crate) struct SelectorDefinition {
 
 // Selector Definition Composites
 
-pub(crate) struct IdentAndSelectorDefinitions<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
+struct IdentAndSelectorDefinitions<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
 
 impl ToTokens for IdentAndSelectorDefinitions<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -125,7 +129,7 @@ impl ToTokens for IdentAndSelectorDefinitions<'_> {
     }
 }
 
-pub(crate) struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
+struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
 
 impl ToTokens for IdentAndSelectorDefinition<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {

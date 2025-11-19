@@ -31,7 +31,7 @@ use crate::util::List;
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(tags), supports(struct_named))]
-pub(crate) struct TagsDerive {
+pub struct TagsDerive {
     ident: Ident,
     #[darling(map = "map")]
     tags: Option<HashMap<Ident, List<TagDefinition>>>,
@@ -77,7 +77,7 @@ impl ToTokens for TagsDerive {
 // Tag
 
 #[derive(Debug)]
-pub(crate) enum TagDefinition {
+pub enum TagDefinition {
     Expr(ExprClosure),
     Ident(Ident),
 }
@@ -103,11 +103,7 @@ impl Parse for TagDefinition {
 
 // Tag Composites
 
-pub(crate) struct IdentPrefixAndTagDefinition<'a>(
-    pub &'a Ident,
-    pub &'a Ident,
-    pub &'a TagDefinition,
-);
+pub struct IdentPrefixAndTagDefinition<'a>(pub &'a Ident, pub &'a Ident, pub &'a TagDefinition);
 
 impl ToTokens for IdentPrefixAndTagDefinition<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -132,7 +128,7 @@ impl ToTokens for IdentPrefixAndTagDefinition<'_> {
 
 // Tag Functions
 
-pub(crate) fn map(
+pub fn map(
     tags: Option<HashMap<String, List<TagDefinition>>>,
 ) -> Option<HashMap<Ident, List<TagDefinition>>> {
     tags.map(|tags| {
@@ -142,7 +138,7 @@ pub(crate) fn map(
     })
 }
 
-pub(crate) fn fold<'a>(
+pub fn fold<'a>(
     ident: &'a Ident,
     tags: Option<&'a HashMap<Ident, List<TagDefinition>>>,
 ) -> Vec<IdentPrefixAndTagDefinition<'a>> {

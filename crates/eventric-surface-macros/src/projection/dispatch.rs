@@ -22,7 +22,7 @@ use crate::util::List;
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(dispatch), supports(struct_named))]
-pub(crate) struct DispatchDerive {
+pub struct DispatchDerive {
     ident: Ident,
     events: List<Path>,
 }

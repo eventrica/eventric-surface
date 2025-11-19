@@ -21,7 +21,7 @@ use crate::util::List;
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(recognize), supports(struct_named))]
-pub(crate) struct RecognizeDerive {
+pub struct RecognizeDerive {
     ident: Ident,
     events: List<Path>,
 }

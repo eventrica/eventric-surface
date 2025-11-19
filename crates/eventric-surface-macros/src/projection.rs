@@ -31,7 +31,7 @@ use crate::projection::{
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(projection), supports(struct_named))]
-pub(crate) struct ProjectionDerive {
+pub struct ProjectionDerive {
     ident: Ident,
     query: QueryDefinition,
 }
@@ -55,7 +55,7 @@ impl ToTokens for ProjectionDerive {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.append_all(ProjectionDerive::projection(&self.ident));
         tokens.append_all(DispatchDerive::dispatch(&self.ident, &self.query.events()));
-        tokens.append_all(QueryDerive::query(&self.ident, &self.query.select));
+        tokens.append_all(QueryDerive::query(&self.ident, self.query.selectors()));
         tokens.append_all(RecognizeDerive::recognize(&self.ident, &self.query.events()));
     }
 }

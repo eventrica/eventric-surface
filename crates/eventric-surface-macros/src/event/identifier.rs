@@ -23,7 +23,7 @@ use syn::{
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(identifier), supports(struct_named))]
-pub(crate) struct IdentifierDerive {
+pub struct IdentifierDerive {
     ident: Ident,
     #[darling(with = "parse")]
     identifier: String,
@@ -58,9 +58,7 @@ impl IdentifierDerive {
 
 impl IdentifierDerive {
     pub fn validate<T>(ident: &str, ok: T) -> darling::Result<T> {
-        Self::validate_identifier(ident)?;
-
-        Ok(ok)
+        Self::validate_identifier(ident).map(|()| ok)
     }
 
     fn validate_identifier(ident: &str) -> darling::Result<()> {
@@ -80,7 +78,7 @@ impl ToTokens for IdentifierDerive {
 
 // Identifier Functions
 
-pub(crate) fn parse(meta: &Meta) -> darling::Result<String> {
+pub fn parse(meta: &Meta) -> darling::Result<String> {
     let identifier = meta.require_list()?;
     let identifier = identifier.tokens.clone().into_iter().collect::<Vec<_>>();
 

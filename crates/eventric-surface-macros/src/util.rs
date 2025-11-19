@@ -1,5 +1,3 @@
-// List
-
 use darling::FromMeta;
 use syn::{
     Meta,
@@ -11,8 +9,12 @@ use syn::{
     token::Comma,
 };
 
+// =================================================================================================
+// Utilities
+// =================================================================================================
+
 #[derive(Debug, Clone)]
-pub(crate) struct List<T>(Vec<T>)
+pub struct List<T>(Vec<T>)
 where
     T: Parse;
 

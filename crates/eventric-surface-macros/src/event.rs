@@ -31,7 +31,7 @@ use crate::{
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(event), supports(struct_named))]
-pub(crate) struct EventDerive {
+pub struct EventDerive {
     ident: Ident,
     #[darling(with = "identifier::parse")]
     identifier: String,
