@@ -85,14 +85,14 @@ pub fn event_derive(input: &DeriveInput) -> TokenStream {
 
 #[doc(hidden)]
 #[must_use]
-pub fn identified_derive(input: &DeriveInput) -> TokenStream {
-    emit_impl_or_error!(event::identifier::IdentifiedDerive::new(input))
+pub fn identifier_derive(input: &DeriveInput) -> TokenStream {
+    emit_impl_or_error!(event::identifier::IdentifierDerive::new(input))
 }
 
 #[doc(hidden)]
 #[must_use]
-pub fn tagged_derive(input: &DeriveInput) -> TokenStream {
-    emit_impl_or_error!(event::tag::TaggedDerive::new(input))
+pub fn tags_derive(input: &DeriveInput) -> TokenStream {
+    emit_impl_or_error!(event::tag::TagsDerive::new(input))
 }
 
 // Projection
@@ -105,6 +105,18 @@ pub fn projection_derive(input: &DeriveInput) -> TokenStream {
 
 #[doc(hidden)]
 #[must_use]
-pub fn query_source_derive(input: &DeriveInput) -> TokenStream {
-    emit_impl_or_error!(projection::query::QueriedDerive::new(input))
+pub fn dispatch_derive(input: &DeriveInput) -> TokenStream {
+    emit_impl_or_error!(projection::dispatch::DispatchDerive::new(input))
+}
+
+#[doc(hidden)]
+#[must_use]
+pub fn query_derive(input: &DeriveInput) -> TokenStream {
+    emit_impl_or_error!(projection::query::QueryDerive::new(input))
+}
+
+#[doc(hidden)]
+#[must_use]
+pub fn recognize_derive(input: &DeriveInput) -> TokenStream {
+    emit_impl_or_error!(projection::recognize::RecognizeDerive::new(input))
 }

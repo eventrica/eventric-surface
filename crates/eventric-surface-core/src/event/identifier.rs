@@ -3,7 +3,7 @@
 use darling::FromDeriveInput;
 use eventric_stream::{
     error::Error,
-    event::Identifier,
+    event,
 };
 use proc_macro2::{
     TokenStream,
@@ -24,8 +24,8 @@ use syn::{
 // Identifier
 // =================================================================================================
 
-pub trait Identified {
-    fn identifier() -> Result<&'static Identifier, Error>;
+pub trait Identifier {
+    fn identifier() -> Result<&'static event::Identifier, Error>;
 }
 
 // =================================================================================================
@@ -33,29 +33,30 @@ pub trait Identified {
 // =================================================================================================
 
 #[derive(Debug, FromDeriveInput)]
-#[darling(attributes(identified), supports(struct_named))]
-pub struct IdentifiedDerive {
+#[darling(attributes(identifier), supports(struct_named))]
+pub struct IdentifierDerive {
     ident: Ident,
     #[darling(with = "parse")]
     identifier: String,
 }
 
-impl IdentifiedDerive {
-    pub(crate) fn new(input: &DeriveInput) -> darling::Result<Self> {
+impl IdentifierDerive {
+    pub fn new(input: &DeriveInput) -> darling::Result<Self> {
         Self::from_derive_input(input).and_then(|identifier| {
-            IdentifiedDerive::validate(&identifier.identifier.clone(), identifier)
+            IdentifierDerive::validate(&identifier.identifier.clone(), identifier)
         })
     }
 }
 
-impl IdentifiedDerive {
-    pub(crate) fn identifier(ident: &Ident, identifier: &str) -> TokenStream {
+impl IdentifierDerive {
+    #[must_use]
+    pub fn identifier(ident: &Ident, identifier: &str) -> TokenStream {
         let cell_type = quote! {std::sync::OnceLock };
         let identifier_type = quote! { eventric_stream::event::Identifier };
         let error_type = quote! { eventric_stream::error::Error };
 
         quote! {
-            impl eventric_surface::event::Identified for #ident {
+            impl eventric_surface::event::Identifier for #ident {
                 fn identifier() -> Result<&'static #identifier_type, #error_type> {
                     static IDENTIFIER: #cell_type<#identifier_type> = #cell_type::new();
 
@@ -66,23 +67,23 @@ impl IdentifiedDerive {
     }
 }
 
-impl IdentifiedDerive {
-    pub(crate) fn validate<T>(ident: &str, ok: T) -> darling::Result<T> {
+impl IdentifierDerive {
+    pub fn validate<T>(ident: &str, ok: T) -> darling::Result<T> {
         Self::validate_identifier(ident)?;
 
         Ok(ok)
     }
 
     fn validate_identifier(ident: &str) -> darling::Result<()> {
-        Identifier::new(ident)
+        event::Identifier::new(ident)
             .map(|_| ())
             .map_err(darling::Error::custom)
     }
 }
 
-impl ToTokens for IdentifiedDerive {
+impl ToTokens for IdentifierDerive {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        tokens.append_all(IdentifiedDerive::identifier(&self.ident, &self.identifier));
+        tokens.append_all(IdentifierDerive::identifier(&self.ident, &self.identifier));
     }
 }
 

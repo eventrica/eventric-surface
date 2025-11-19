@@ -25,8 +25,8 @@ use syn::{
 
 use crate::{
     event::{
-        identifier::IdentifiedDerive,
-        tag::TaggedDerive,
+        identifier::IdentifierDerive,
+        tag::TagsDerive,
     },
     macros::List,
 };
@@ -35,7 +35,21 @@ use crate::{
 // Event
 // =================================================================================================
 
-pub trait Event: DeserializeOwned + Identified + Tagged + Serialize {}
+pub trait Event: DeserializeOwned + Identifier + Tags + Serialize {}
+
+// -------------------------------------------------------------------------------------------------
+
+// Re-Exports
+
+pub use self::{
+    codec::{
+        Codec,
+        JsonCodec,
+    },
+    identifier::Identifier,
+    specifier::Specifier,
+    tag::Tags,
+};
 
 // =================================================================================================
 // Event Macros
@@ -48,13 +62,13 @@ pub(crate) struct EventDerive {
     #[darling(with = "identifier::parse")]
     identifier: String,
     #[darling(map = "tag::map")]
-    tags: Option<HashMap<Ident, List<tag::TagValueSource>>>,
+    tags: Option<HashMap<Ident, List<tag::TagDefinition>>>,
 }
 
 impl EventDerive {
     pub fn new(input: &DeriveInput) -> darling::Result<Self> {
         Self::from_derive_input(input)
-            .and_then(|event| IdentifiedDerive::validate(&event.identifier.clone(), event))
+            .and_then(|event| IdentifierDerive::validate(&event.identifier.clone(), event))
     }
 }
 
@@ -69,21 +83,7 @@ impl EventDerive {
 impl ToTokens for EventDerive {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.append_all(EventDerive::event(&self.ident));
-        tokens.append_all(IdentifiedDerive::identifier(&self.ident, &self.identifier));
-        tokens.append_all(TaggedDerive::tags(&self.ident, self.tags.as_ref()));
+        tokens.append_all(IdentifierDerive::identifier(&self.ident, &self.identifier));
+        tokens.append_all(TagsDerive::tags(&self.ident, self.tags.as_ref()));
     }
 }
-
-// -------------------------------------------------------------------------------------------------
-
-// Re-Exports
-
-pub use self::{
-    codec::{
-        Codec,
-        JsonCodec,
-    },
-    identifier::Identified,
-    specifier::Specified,
-    tag::Tagged,
-};

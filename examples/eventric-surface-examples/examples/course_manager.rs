@@ -6,12 +6,9 @@
 #![feature(once_cell_try)]
 #![feature(if_let_guard)]
 
-use std::any::Any;
-
 use derive_more::Debug;
 use eventric_stream::{
     error::Error,
-    event::PersistentEvent,
     stream::{
         Stream,
         append,
@@ -22,20 +19,16 @@ use eventric_surface::{
     event::{
         Codec,
         Event,
-        Identified as _,
         json,
     },
     projection::{
-        Dispatch,
+        Dispatch as _,
         Projection,
-        Queried,
         Recognize,
         Update,
+        UpdateEvent,
+        query::Query as _,
     },
-};
-use eventric_surface_examples::{
-    DeserializedPersistentEvent,
-    // GetSpecifier as _,
 };
 use fancy_constructor::new;
 use serde::{
@@ -47,40 +40,6 @@ use serde::{
 
 // At least initially, event versioning will be ignored entirely (all versions
 // will be set to zero for now, until a meaningful model is in place).
-
-// -------------------------------------------------------------------------------------------------
-
-// Theoretically Generated...
-
-impl Dispatch for CourseExists {
-    fn dispatch(&mut self, event: &Box<dyn Any>) {
-        match event {
-            event if let Some(event) = event.downcast_ref::<CourseRegistered>() => {
-                self.update(event);
-            }
-            _ => {}
-        }
-    }
-}
-
-impl Recognize for CourseExists {
-    fn recognize<C>(codec: &C, event: &PersistentEvent) -> Result<Option<Box<dyn Any>>, Error>
-    where
-        C: Codec,
-    {
-        let event = match event.identifier() {
-            identifier if identifier == CourseRegistered::identifier()? => {
-                let event = codec.decode::<CourseRegistered>(event)?;
-                let event = Box::new(event) as Box<dyn Any>;
-
-                Some(event)
-            }
-            _ => None,
-        };
-
-        Ok(event)
-    }
-}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -96,6 +55,13 @@ pub struct CourseRegistered {
     pub capacity: u8,
 }
 
+// #[derive(new, Debug, Deserialize, Event, Serialize)]
+// #[event(identifier(course_removed), tags(course_id(id)))]
+// pub struct CourseRemoved {
+//     #[new(into)]
+//     pub id: String,
+// }
+
 // Decisions
 
 #[derive(new, Debug, Projection)]
@@ -108,10 +74,16 @@ pub struct CourseExists {
 }
 
 impl Update<CourseRegistered> for CourseExists {
-    fn update(&mut self, _: &CourseRegistered) {
+    fn update(&mut self, _: UpdateEvent<'_, CourseRegistered>) {
         self.exists = true;
     }
 }
+
+// impl Update<CourseRemoved> for CourseExists {
+//     fn update(&mut self, _: UpdateEvent<'_, CourseRemoved>) {
+//         self.exists = false;
+//     }
+// }
 
 // Example...
 
@@ -126,11 +98,11 @@ pub fn main() -> Result<(), Error> {
 
     println!("creating new decision");
 
-    let mut decision = CourseExists::new(course_id);
+    let mut projection = CourseExists::new(course_id);
 
-    println!("current decision state: {decision:#?}");
+    println!("current decision state: {projection:#?}");
 
-    let query = decision.query()?;
+    let query = projection.query()?;
     let condition = query::Condition::default().matches(&query);
 
     let mut position = None;
@@ -142,17 +114,15 @@ pub fn main() -> Result<(), Error> {
 
         position = Some(*event.position());
 
-        if let Some(deserialized) = CourseExists::recognize(&codec, &event)? {
-            let event = DeserializedPersistentEvent::new(deserialized, event);
-
-            decision.dispatch(&event.deserialized);
+        if let Some(event) = CourseExists::recognize(&codec, &event)? {
+            projection.dispatch(&event);
         }
     }
 
     println!("making decision");
-    println!("current decision state: {decision:#?}");
+    println!("current decision state: {projection:#?}");
 
-    if decision.exists {
+    if projection.exists {
         println!("decision invalid, course already exists");
     } else {
         println!("decision valid, creating condition to append");
@@ -170,7 +140,7 @@ pub fn main() -> Result<(), Error> {
         let event = CourseRegistered::new(course_id, "My Course", 30);
         let event = codec.encode(event)?;
 
-        println!("appending event: {event:#?}");
+        println!("appending event: {event:?}");
 
         stream.append([&event], Some(&condition))?;
     }

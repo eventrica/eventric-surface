@@ -11,7 +11,7 @@ use darling::{
 };
 use eventric_stream::{
     error::Error,
-    stream::query::Query,
+    stream::query,
 };
 use proc_macro2::TokenStream;
 use quote::{
@@ -28,7 +28,7 @@ use syn::{
 use crate::{
     event::{
         tag,
-        tag::TagValueSource,
+        tag::TagDefinition,
     },
     macros::List,
 };
@@ -37,8 +37,8 @@ use crate::{
 // Query
 // =================================================================================================
 
-pub trait Queried {
-    fn query(&self) -> Result<Query, Error>;
+pub trait Query {
+    fn query(&self) -> Result<query::Query, Error>;
 }
 
 // =================================================================================================
@@ -48,27 +48,29 @@ pub trait Queried {
 // Queried
 
 #[derive(Debug, FromDeriveInput)]
-#[darling(attributes(queried), supports(struct_named))]
-pub struct QueriedDerive {
+#[darling(attributes(query), supports(struct_named))]
+pub struct QueryDerive {
     ident: Ident,
-    query: QueryDefinition,
+    #[darling(multiple)]
+    select: Vec<SelectorDefinition>,
 }
 
-impl QueriedDerive {
-    pub(crate) fn new(input: &DeriveInput) -> darling::Result<Self> {
+impl QueryDerive {
+    pub fn new(input: &DeriveInput) -> darling::Result<Self> {
         Self::from_derive_input(input)
     }
 }
 
-impl QueriedDerive {
-    pub(crate) fn queried(ident: &Ident, query: &QueryDefinition) -> TokenStream {
-        let query = IdentAndQueryDefinition(ident, query);
+impl QueryDerive {
+    #[must_use]
+    pub fn query(ident: &Ident, selectors: &Vec<SelectorDefinition>) -> TokenStream {
+        let query = IdentAndSelectorDefinitions(ident, selectors);
 
         let query_type = quote! { eventric_stream::stream::query::Query };
         let error_type = quote! { eventric_stream::error::Error };
 
         quote! {
-            impl eventric_surface::projection::Queried for #ident {
+            impl eventric_surface::projection::query::Query for #ident {
                 fn query(&self) -> Result<#query_type, #error_type> {
                     #query
                 }
@@ -77,9 +79,9 @@ impl QueriedDerive {
     }
 }
 
-impl ToTokens for QueriedDerive {
+impl ToTokens for QueryDerive {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        tokens.append_all(QueriedDerive::queried(&self.ident, &self.query));
+        tokens.append_all(QueryDerive::query(&self.ident, &self.select));
     }
 }
 
@@ -94,21 +96,38 @@ pub struct QueryDefinition {
 }
 
 impl QueryDefinition {
-    pub fn events(&self) -> HashSet<&Path> {
-        self.select.iter().flat_map(|s| s.events.as_ref()).collect()
+    #[must_use]
+    pub fn events(&self) -> Vec<Path> {
+        self.select
+            .iter()
+            .flat_map(|selector| selector.events.as_ref())
+            .cloned()
+            .collect::<HashSet<_>>()
+            .into_iter()
+            .collect()
     }
 }
 
-// Query Composites
+// -------------------------------------------------------------------------------------------------
 
-pub struct IdentAndQueryDefinition<'a>(pub &'a Ident, pub &'a QueryDefinition);
+// Selector Definition
 
-impl ToTokens for IdentAndQueryDefinition<'_> {
+#[derive(Debug, FromMeta)]
+pub struct SelectorDefinition {
+    events: List<Path>,
+    #[darling(map = "tag::map")]
+    filter: Option<HashMap<Ident, List<TagDefinition>>>,
+}
+
+// Selector Definition Composites
+
+pub struct IdentAndSelectorDefinitions<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
+
+impl ToTokens for IdentAndSelectorDefinitions<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let IdentAndQueryDefinition(ident, query) = *self;
+        let IdentAndSelectorDefinitions(ident, selectors) = *self;
 
-        let selector = query
-            .select
+        let selector = selectors
             .iter()
             .map(|selector| IdentAndSelectorDefinition(ident, selector));
 
@@ -120,20 +139,7 @@ impl ToTokens for IdentAndQueryDefinition<'_> {
     }
 }
 
-// -------------------------------------------------------------------------------------------------
-
-// Selector Definition
-
-#[derive(Debug, FromMeta)]
-pub struct SelectorDefinition {
-    pub events: List<Path>,
-    #[darling(map = "tag::map")]
-    filter: Option<HashMap<Ident, List<TagValueSource>>>,
-}
-
-// Selector Definition Composites
-
-pub struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
+struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
 
 impl ToTokens for IdentAndSelectorDefinition<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -143,18 +149,18 @@ impl ToTokens for IdentAndSelectorDefinition<'_> {
         let tag = tag::fold(ident, selector.filter.as_ref());
 
         let selector_type = quote! { eventric_stream::stream::query::Selector };
-        let specified_trait = quote! { eventric_surface::event::Specified };
+        let specifier_trait = quote! { eventric_surface::event::Specifier };
 
         if tag.is_empty() {
             tokens.append_all(quote! {
                 #selector_type::specifiers(
-                    [#(<#event as #specified_trait>::specifier()?),*]
+                    [#(<#event as #specifier_trait>::specifier()?),*]
                 )
             });
         } else {
             tokens.append_all(quote! {
                 #selector_type::specifiers_and_tags(
-                    [#(<#event as #specified_trait>::specifier()?),*],
+                    [#(<#event as #specifier_trait>::specifier()?),*],
                     [#(#tag?),*]
                 )
             });

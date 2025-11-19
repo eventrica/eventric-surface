@@ -8,14 +8,14 @@ pub mod event {
     pub use eventric_surface_core::event::{
         Codec,
         Event,
-        Identified,
-        Specified,
-        Tagged,
+        Identifier,
+        Specifier,
+        Tags,
     };
     pub use eventric_surface_macros::{
         Event,
-        Identified,
-        Tagged,
+        Identifier,
+        Tags,
     };
 
     pub mod json {
@@ -26,13 +26,20 @@ pub mod event {
 pub mod projection {
     pub use eventric_surface_core::projection::{
         Dispatch,
+        DispatchEvent,
         Projection,
-        Queried,
         Recognize,
         Update,
+        UpdateEvent,
     };
     pub use eventric_surface_macros::{
+        Dispatch,
         Projection,
-        QuerySource,
+        Recognize,
     };
+
+    pub mod query {
+        pub use eventric_surface_core::projection::query::Query;
+        pub use eventric_surface_macros::Query;
+    }
 }

@@ -1,20 +1,16 @@
 #![allow(clippy::needless_continue)]
 
-pub(crate) mod dispatch;
-pub(crate) mod query;
+pub mod query;
 
-use std::any::Any;
+pub(crate) mod dispatch;
+pub(crate) mod recognize;
+pub(crate) mod update;
 
 use darling::FromDeriveInput;
-use eventric_stream::{
-    error::Error,
-    event::PersistentEvent,
-};
 use proc_macro2::TokenStream;
 use quote::{
     ToTokens,
     TokenStreamExt as _,
-    format_ident,
     quote,
 };
 use syn::{
@@ -22,15 +18,14 @@ use syn::{
     Ident,
 };
 
-use crate::{
-    event::{
-        Codec,
-        Event,
-    },
-    projection::query::{
-        QueriedDerive,
+use crate::projection::{
+    dispatch::DispatchDerive,
+    query::{
+        Query,
         QueryDefinition,
+        QueryDerive,
     },
+    recognize::RecognizeDerive,
 };
 
 // =================================================================================================
@@ -39,26 +34,23 @@ use crate::{
 
 // Projection
 
-pub trait Projection: Dispatch + Recognize + Queried {}
+pub trait Projection: Dispatch + Recognize + Query {}
 
-// Dispatch
+// -------------------------------------------------------------------------------------------------
 
-// Recognise
+// Re-Exports
 
-pub trait Recognize {
-    fn recognize<C>(codec: &C, event: &PersistentEvent) -> Result<Option<Box<dyn Any>>, Error>
-    where
-        C: Codec;
-}
-
-// Update
-
-pub trait Update<E>
-where
-    E: Event,
-{
-    fn update(&mut self, event: &E);
-}
+pub use self::{
+    dispatch::{
+        Dispatch,
+        DispatchEvent,
+    },
+    recognize::Recognize,
+    update::{
+        Update,
+        UpdateEvent,
+    },
+};
 
 // =================================================================================================
 // Projection Macros
@@ -83,34 +75,16 @@ impl ProjectionDerive {
             impl eventric_surface::projection::Projection for #ident {}
         }
     }
-
-    fn update(ident: &Ident, query: &QueryDefinition) -> TokenStream {
-        let event = query.events().into_iter();
-        let ident_update_trait = format_ident!("{ident}Update");
-
-        let update_trait = quote! { eventric_surface::projection::Update };
-
-        quote! {
-            trait #ident_update_trait: #(#update_trait<#event>)+* {}
-
-            impl #ident_update_trait for #ident {}
-        }
-    }
 }
 
 impl ToTokens for ProjectionDerive {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.append_all(ProjectionDerive::projection(&self.ident));
-        tokens.append_all(ProjectionDerive::update(&self.ident, &self.query));
-        tokens.append_all(QueriedDerive::queried(&self.ident, &self.query));
+        tokens.append_all(DispatchDerive::dispatch(&self.ident, &self.query.events()));
+        tokens.append_all(QueryDerive::query(&self.ident, &self.query.select));
+        tokens.append_all(RecognizeDerive::recognize(
+            &self.ident,
+            &self.query.events(),
+        ));
     }
 }
-
-// -------------------------------------------------------------------------------------------------
-
-// Re-Exports
-
-pub use self::{
-    dispatch::Dispatch,
-    query::Queried,
-};

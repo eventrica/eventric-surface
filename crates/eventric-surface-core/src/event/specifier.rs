@@ -1,23 +1,23 @@
 use eventric_stream::{
     error::Error,
-    event::Specifier,
+    event,
 };
 
-use crate::event::identifier::Identified;
+use crate::event::identifier::Identifier;
 
 // =================================================================================================
 // Specifier
 // =================================================================================================
 
-pub trait Specified {
-    fn specifier() -> Result<Specifier, Error>;
+pub trait Specifier {
+    fn specifier() -> Result<event::Specifier, Error>;
 }
 
-impl<T> Specified for T
+impl<T> Specifier for T
 where
-    T: Identified,
+    T: Identifier,
 {
-    fn specifier() -> Result<Specifier, Error> {
-        T::identifier().cloned().map(Specifier::new)
+    fn specifier() -> Result<event::Specifier, Error> {
+        T::identifier().cloned().map(event::Specifier::new)
     }
 }

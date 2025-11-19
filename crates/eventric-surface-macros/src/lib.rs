@@ -22,14 +22,14 @@ pub fn event(input: TokenStream) -> TokenStream {
     macros::event_derive(&parse_macro_input!(input)).into()
 }
 
-#[proc_macro_derive(Identified, attributes(identified))]
-pub fn identified(input: TokenStream) -> TokenStream {
-    macros::identified_derive(&parse_macro_input!(input)).into()
+#[proc_macro_derive(Identifier, attributes(identifier))]
+pub fn identifier(input: TokenStream) -> TokenStream {
+    macros::identifier_derive(&parse_macro_input!(input)).into()
 }
 
-#[proc_macro_derive(Tagged, attributes(tagged))]
-pub fn tagged(input: TokenStream) -> TokenStream {
-    macros::tagged_derive(&parse_macro_input!(input)).into()
+#[proc_macro_derive(Tags, attributes(tags))]
+pub fn tags(input: TokenStream) -> TokenStream {
+    macros::tags_derive(&parse_macro_input!(input)).into()
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -41,7 +41,17 @@ pub fn projection(input: TokenStream) -> TokenStream {
     macros::projection_derive(&parse_macro_input!(input)).into()
 }
 
-#[proc_macro_derive(QuerySource, attributes(query_source))]
-pub fn query_source(input: TokenStream) -> TokenStream {
-    macros::query_source_derive(&parse_macro_input!(input)).into()
+#[proc_macro_derive(Dispatch, attributes(dispatch))]
+pub fn dispatch(input: TokenStream) -> TokenStream {
+    macros::dispatch_derive(&parse_macro_input!(input)).into()
+}
+
+#[proc_macro_derive(Query, attributes(query))]
+pub fn query(input: TokenStream) -> TokenStream {
+    macros::query_derive(&parse_macro_input!(input)).into()
+}
+
+#[proc_macro_derive(Recognize, attributes(recognize))]
+pub fn recognize(input: TokenStream) -> TokenStream {
+    macros::recognize_derive(&parse_macro_input!(input)).into()
 }
