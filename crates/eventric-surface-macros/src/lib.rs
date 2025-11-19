@@ -24,7 +24,7 @@ pub fn event(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Identified, attributes(identified))]
 pub fn identified(input: TokenStream) -> TokenStream {
-    macros::derive::identifier(&parse_macro_input!(input)).into()
+    macros::derive::identified(&parse_macro_input!(input)).into()
 }
 
 #[proc_macro_derive(Tagged, attributes(tagged))]
