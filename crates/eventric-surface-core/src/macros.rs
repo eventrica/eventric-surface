@@ -1,3 +1,6 @@
+//! See the `eventric-surface` crate for full documentation, including
+//! module-level documentation.
+
 use darling::FromMeta;
 use proc_macro2::TokenStream;
 use quote::ToTokens;

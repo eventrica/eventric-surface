@@ -37,7 +37,7 @@ pub trait Recognize {
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(recognize), supports(struct_named))]
-pub struct RecognizeDerive {
+pub(crate) struct RecognizeDerive {
     ident: Ident,
     events: List<Path>,
 }

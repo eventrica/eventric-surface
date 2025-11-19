@@ -81,7 +81,7 @@ impl DispatchEvent {
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(dispatch), supports(struct_named))]
-pub struct DispatchDerive {
+pub(crate) struct DispatchDerive {
     ident: Ident,
     events: List<Path>,
 }

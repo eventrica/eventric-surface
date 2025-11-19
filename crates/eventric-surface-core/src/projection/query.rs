@@ -1,3 +1,6 @@
+//! See the `eventric-surface` crate for full documentation, including
+//! module-level documentation.
+
 #![allow(clippy::needless_continue)]
 
 use std::collections::{
@@ -49,7 +52,7 @@ pub trait Query {
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(query), supports(struct_named))]
-pub struct QueryDerive {
+pub(crate) struct QueryDerive {
     ident: Ident,
     #[darling(multiple)]
     select: Vec<SelectorDefinition>,
@@ -90,7 +93,7 @@ impl ToTokens for QueryDerive {
 // Query Definition
 
 #[derive(Debug, FromMeta)]
-pub struct QueryDefinition {
+pub(crate) struct QueryDefinition {
     #[darling(multiple)]
     pub select: Vec<SelectorDefinition>,
 }
@@ -113,7 +116,7 @@ impl QueryDefinition {
 // Selector Definition
 
 #[derive(Debug, FromMeta)]
-pub struct SelectorDefinition {
+pub(crate) struct SelectorDefinition {
     events: List<Path>,
     #[darling(map = "tag::map")]
     filter: Option<HashMap<Ident, List<TagDefinition>>>,
@@ -121,7 +124,7 @@ pub struct SelectorDefinition {
 
 // Selector Definition Composites
 
-pub struct IdentAndSelectorDefinitions<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
+pub(crate) struct IdentAndSelectorDefinitions<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
 
 impl ToTokens for IdentAndSelectorDefinitions<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -139,7 +142,7 @@ impl ToTokens for IdentAndSelectorDefinitions<'_> {
     }
 }
 
-struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
+pub(crate) struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
 
 impl ToTokens for IdentAndSelectorDefinition<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {

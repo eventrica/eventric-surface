@@ -34,7 +34,7 @@ pub trait Identifier {
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(identifier), supports(struct_named))]
-pub struct IdentifierDerive {
+pub(crate) struct IdentifierDerive {
     ident: Ident,
     #[darling(with = "parse")]
     identifier: String,
@@ -91,7 +91,7 @@ impl ToTokens for IdentifierDerive {
 
 // Identifier Functions
 
-pub fn parse(meta: &Meta) -> darling::Result<String> {
+pub(crate) fn parse(meta: &Meta) -> darling::Result<String> {
     let identifier = meta.require_list()?;
     let identifier = identifier.tokens.clone().into_iter().collect::<Vec<_>>();
 

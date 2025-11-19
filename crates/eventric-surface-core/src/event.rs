@@ -1,3 +1,6 @@
+//! See the `eventric-surface` crate for full documentation, including
+//! module-level documentation.
+
 #![allow(clippy::needless_continue)]
 
 pub(crate) mod codec;

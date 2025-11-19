@@ -1,3 +1,6 @@
+//! See the `eventric-surface` crate for full documentation, including
+//! module-level documentation.
+
 #![allow(clippy::needless_continue)]
 
 pub mod query;
@@ -58,7 +61,7 @@ pub use self::{
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(projection), supports(struct_named))]
-pub struct ProjectionDerive {
+pub(crate) struct ProjectionDerive {
     ident: Ident,
     query: QueryDefinition,
 }

@@ -45,7 +45,7 @@ pub trait Tags {
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(tags), supports(struct_named))]
-pub struct TagsDerive {
+pub(crate) struct TagsDerive {
     ident: Ident,
     #[darling(map = "map")]
     tags: Option<HashMap<Ident, List<TagDefinition>>>,
@@ -91,7 +91,7 @@ impl ToTokens for TagsDerive {
 // Tag
 
 #[derive(Debug)]
-pub enum TagDefinition {
+pub(crate) enum TagDefinition {
     Expr(ExprClosure),
     Ident(Ident),
 }
@@ -117,7 +117,11 @@ impl Parse for TagDefinition {
 
 // Tag Composites
 
-pub struct IdentPrefixAndTagDefinition<'a>(pub &'a Ident, pub &'a Ident, pub &'a TagDefinition);
+pub(crate) struct IdentPrefixAndTagDefinition<'a>(
+    pub &'a Ident,
+    pub &'a Ident,
+    pub &'a TagDefinition,
+);
 
 impl ToTokens for IdentPrefixAndTagDefinition<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -142,7 +146,7 @@ impl ToTokens for IdentPrefixAndTagDefinition<'_> {
 
 // Tag Functions
 
-pub fn map(
+pub(crate) fn map(
     tags: Option<HashMap<String, List<TagDefinition>>>,
 ) -> Option<HashMap<Ident, List<TagDefinition>>> {
     tags.map(|tags| {
@@ -152,7 +156,7 @@ pub fn map(
     })
 }
 
-pub fn fold<'a>(
+pub(crate) fn fold<'a>(
     ident: &'a Ident,
     tags: Option<&'a HashMap<Ident, List<TagDefinition>>>,
 ) -> Vec<IdentPrefixAndTagDefinition<'a>> {
