@@ -7,6 +7,7 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(missing_docs)]
 
+pub mod decision;
 pub mod error;
 pub mod event;
 pub mod projection;

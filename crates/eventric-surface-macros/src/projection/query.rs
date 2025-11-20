@@ -47,13 +47,13 @@ impl QueryDerive {
 impl QueryDerive {
     #[must_use]
     pub fn query(ident: &Ident, selectors: &Vec<SelectorDefinition>) -> TokenStream {
-        let query = IdentAndSelectorDefinitions(ident, selectors);
+        let query = IntoQueryTokens(ident, selectors);
 
         let query_type = quote! { eventric_stream::stream::query::Query };
         let error_type = quote! { eventric_stream::error::Error };
 
         quote! {
-            impl eventric_surface::projection::query::Query for #ident {
+            impl eventric_surface::projection::Query for #ident {
                 fn query(&self) -> Result<#query_type, #error_type> {
                     #query
                 }
@@ -81,15 +81,15 @@ pub struct SelectorDefinition {
 
 // Selector Definition Composites
 
-struct IdentAndSelectorDefinitions<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
+struct IntoQueryTokens<'a>(pub &'a Ident, pub &'a Vec<SelectorDefinition>);
 
-impl ToTokens for IdentAndSelectorDefinitions<'_> {
+impl ToTokens for IntoQueryTokens<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let IdentAndSelectorDefinitions(ident, selectors) = *self;
+        let IntoQueryTokens(ident, selectors) = *self;
 
         let selector = selectors
             .iter()
-            .map(|selector| IdentAndSelectorDefinition(ident, selector));
+            .map(|selector| IntoSelectorTokens(ident, selector));
 
         let query_type = quote! { eventric_stream::stream::query::Query };
 
@@ -99,11 +99,11 @@ impl ToTokens for IdentAndSelectorDefinitions<'_> {
     }
 }
 
-struct IdentAndSelectorDefinition<'a>(pub &'a Ident, pub &'a SelectorDefinition);
+struct IntoSelectorTokens<'a>(pub &'a Ident, pub &'a SelectorDefinition);
 
-impl ToTokens for IdentAndSelectorDefinition<'_> {
+impl ToTokens for IntoSelectorTokens<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let IdentAndSelectorDefinition(ident, selector) = *self;
+        let IntoSelectorTokens(ident, selector) = *self;
 
         let event = selector.events.as_ref();
         let tag = tag::fold(ident, selector.filter.as_ref());

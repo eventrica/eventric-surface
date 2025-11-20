@@ -1,32 +1,22 @@
 //! See the `eventric-surface` crate for full documentation, including
 //! module-level documentation.
 
-pub(crate) mod dispatch;
+pub(crate) mod projections;
 pub(crate) mod query;
-pub(crate) mod recognize;
 pub(crate) mod update;
 
 // =================================================================================================
-// Projection
+// Decision
 // =================================================================================================
 
-// Projection
-
-pub trait Projection: Dispatch + Recognize + Query {}
+pub trait Decision: Projections + Query + Update {}
 
 // -------------------------------------------------------------------------------------------------
 
 // Re-Exports
 
 pub use self::{
-    dispatch::{
-        Dispatch,
-        DispatchEvent,
-    },
+    projections::Projections,
     query::Query,
-    recognize::Recognize,
-    update::{
-        Update,
-        UpdateEvent,
-    },
+    update::Update,
 };

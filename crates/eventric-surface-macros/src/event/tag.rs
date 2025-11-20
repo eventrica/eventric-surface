@@ -3,10 +3,7 @@
 use std::collections::HashMap;
 
 use darling::FromDeriveInput;
-use proc_macro2::{
-    Span,
-    TokenStream,
-};
+use proc_macro2::TokenStream;
 use quote::{
     ToTokens,
     TokenStreamExt as _,
@@ -15,6 +12,7 @@ use quote::{
 };
 use syn::{
     DeriveInput,
+    Expr,
     ExprClosure,
     Ident,
     parse::{
@@ -78,43 +76,47 @@ impl ToTokens for TagsDerive {
 
 #[derive(Debug)]
 pub enum TagDefinition {
-    Expr(ExprClosure),
+    ExprClosure(ExprClosure),
     Ident(Ident),
 }
 
 impl Parse for TagDefinition {
-    fn parse(stream: ParseStream<'_>) -> syn::Result<Self> {
-        if let Ok(mut expr) = ExprClosure::parse(stream) {
+    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
+        if let Ok(mut expr) = ExprClosure::parse(input) {
             let body = &expr.body;
             let body = syn::parse2(quote! { { #body }.into() })?;
 
             *expr.body = body;
 
-            return Ok(Self::Expr(expr));
+            return Ok(Self::ExprClosure(expr));
         }
 
-        if let Ok(ident) = Ident::parse(stream) {
+        if let Ok(ident) = Ident::parse(input) {
             return Ok(Self::Ident(ident));
         }
 
-        Err(syn::Error::new(Span::call_site(), "Unexpected Tag Format"))
+        Expr::parse(input).and_then(|expr| {
+            Ok(Self::ExprClosure(syn::parse2(
+                quote! { |this| { #expr }.into() },
+            )?))
+        })
     }
 }
 
 // Tag Composites
 
-pub struct IdentPrefixAndTagDefinition<'a>(pub &'a Ident, pub &'a Ident, pub &'a TagDefinition);
+pub struct IntoTagTokens<'a>(pub &'a Ident, pub &'a Ident, pub &'a TagDefinition);
 
-impl ToTokens for IdentPrefixAndTagDefinition<'_> {
+impl ToTokens for IntoTagTokens<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let IdentPrefixAndTagDefinition(ident, prefix, tag) = *self;
+        let IntoTagTokens(ident, prefix, tag) = *self;
 
         let tag_macro = quote! { eventric_stream::event::tag };
         let identity_fn = quote! { std::convert::identity };
         let cow_type = quote! { std::borrow::Cow };
 
         match tag {
-            TagDefinition::Expr(expr) => tokens.append_all(quote! {
+            TagDefinition::ExprClosure(expr) => tokens.append_all(quote! {
                 #tag_macro!(#prefix, #identity_fn::<for<'a> fn(&'a #ident) -> #cow_type<'a, _>>(#expr)(&self))
             }),
             TagDefinition::Ident(ident) => tokens.append_all(quote! {
@@ -141,12 +143,12 @@ pub fn map(
 pub fn fold<'a>(
     ident: &'a Ident,
     tags: Option<&'a HashMap<Ident, List<TagDefinition>>>,
-) -> Vec<IdentPrefixAndTagDefinition<'a>> {
+) -> Vec<IntoTagTokens<'a>> {
     tags.as_ref()
         .map(|tags| {
             tags.iter().fold(Vec::new(), |mut acc, (prefix, tags)| {
                 for tag in tags.as_ref() {
-                    acc.push(IdentPrefixAndTagDefinition(ident, prefix, tag));
+                    acc.push(IntoTagTokens(ident, prefix, tag));
                 }
 
                 acc

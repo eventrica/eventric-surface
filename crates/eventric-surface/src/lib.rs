@@ -5,6 +5,11 @@
 // =================================================================================================
 
 pub mod decision {
+    pub use eventric_surface_core::decision::{
+        Projections,
+        Query,
+        Update,
+    };
     pub use eventric_surface_macros::Decision;
 }
 
@@ -32,6 +37,7 @@ pub mod projection {
         Dispatch,
         DispatchEvent,
         Projection,
+        Query,
         Recognize,
         Update,
         UpdateEvent,
@@ -39,11 +45,7 @@ pub mod projection {
     pub use eventric_surface_macros::{
         Dispatch,
         Projection,
+        Query,
         Recognize,
     };
-
-    pub mod query {
-        pub use eventric_surface_core::projection::query::Query;
-        pub use eventric_surface_macros::Query;
-    }
 }

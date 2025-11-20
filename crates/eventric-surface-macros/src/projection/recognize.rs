@@ -44,7 +44,7 @@ impl RecognizeDerive {
 
         quote! {
             impl eventric_surface::projection::Recognize for #ident {
-                fn recognize<C>(codec: &C, event: &#persistent_event_type) -> Result<Option<#dispatch_event_type>, #error_type>
+                fn recognize<C>(&self, codec: &C, event: &#persistent_event_type) -> Result<Option<#dispatch_event_type>, #error_type>
                 where
                     C: #codec_trait,
                 {

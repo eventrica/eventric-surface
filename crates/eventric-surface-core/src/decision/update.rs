@@ -4,20 +4,21 @@ use eventric_stream::{
 };
 
 use crate::{
+    decision::projections::Projections,
     event::codec::Codec,
-    projection::dispatch::DispatchEvent,
 };
 
 // =================================================================================================
-// Recognise
+// Update
 // =================================================================================================
 
-pub trait Recognize {
-    fn recognize<C>(
+pub trait Update: Projections {
+    fn update<C>(
         &self,
         codec: &C,
         event: &PersistentEvent,
-    ) -> Result<Option<DispatchEvent>, Error>
+        projections: &mut Self::Projections,
+    ) -> Result<(), Error>
     where
         C: Codec;
 }
