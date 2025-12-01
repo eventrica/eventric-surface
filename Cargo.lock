@@ -3,12 +3,6 @@
 version = 4
 
 [[package]]
-name = "any-range"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0051fc32c88f2ae4928016edb69e686614fe0dad8aea937c36be071bcb71434"
-
-[[package]]
 name = "bitflags"
 version = "2.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -28,9 +22,9 @@ checksum = "b35204fbdc0b3f4446b89fc1ac2cf84a8a68971995d0bf2e925ec7cd960f9cb3"
 
 [[package]]
 name = "byteview"
-version = "0.8.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e6b0e42e210b794e14b152c6fe1a55831e30ef4a0f5dc39d73d714fb5f1906c"
+checksum = "d6e3a2110d267b9881afe689e6eebcc7635534a827928bd69bef59a8f9db644a"
 
 [[package]]
 name = "cfg-if"
@@ -192,7 +186,7 @@ dependencies = [
 [[package]]
 name = "eventric-core"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-core.git#735125023193228540ff430e9ae904b302e19e37"
+source = "git+https://github.com/eventrica/eventric-core.git#c76a28710ecfa415672842a5fbe15a7079b5543d"
 dependencies = [
  "thiserror",
 ]
@@ -200,7 +194,7 @@ dependencies = [
 [[package]]
 name = "eventric-stream"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-stream.git#67f6a2a93b1c28d8b735ca713611084e2d6e0c68"
+source = "git+https://github.com/eventrica/eventric-stream.git#b790d58435f7d5803107786b75f87bd5aba59082"
 dependencies = [
  "eventric-stream-core",
  "eventric-stream-macros",
@@ -210,9 +204,8 @@ dependencies = [
 [[package]]
 name = "eventric-stream-core"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-stream.git#67f6a2a93b1c28d8b735ca713611084e2d6e0c68"
+source = "git+https://github.com/eventrica/eventric-stream.git#b790d58435f7d5803107786b75f87bd5aba59082"
 dependencies = [
- "any-range",
  "bytes",
  "dashmap",
  "derive_more",
@@ -222,16 +215,16 @@ dependencies = [
  "fjall",
  "rand",
  "rapidhash",
+ "smallvec",
  "thiserror",
 ]
 
 [[package]]
 name = "eventric-stream-macros"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-stream.git#67f6a2a93b1c28d8b735ca713611084e2d6e0c68"
+source = "git+https://github.com/eventrica/eventric-stream.git#b790d58435f7d5803107786b75f87bd5aba59082"
 dependencies = [
  "darling",
- "eventric-stream-core",
  "proc-macro2",
  "quote",
  "syn",
@@ -304,9 +297,9 @@ checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "fjall"
-version = "3.0.0-pre.7"
+version = "3.0.0-rc.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38fab709044a8e2caa4544c7b352360775967a833bfe6a20d3fc6248882b55d6"
+checksum = "9fc3bfdab6346e8aa783ff7241a3475a20db3ec636cd8dd14d369758be0977ad"
 dependencies = [
  "byteorder-lite",
  "byteview",
@@ -445,9 +438,9 @@ checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 
 [[package]]
 name = "lsm-tree"
-version = "3.0.0-pre.7"
+version = "3.0.0-rc.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16d54fa339f44103a194d3e7f208a33c666391a9d9ddb2621f956f4d223a407f"
+checksum = "e4b3d08af4e1a58b3366f778c4ad39a43f528d60ffc00f0d6333ea5d33a367b3"
 dependencies = [
  "byteorder-lite",
  "byteview",
@@ -456,6 +449,7 @@ dependencies = [
  "interval-heap",
  "log",
  "lz4_flex",
+ "mutants",
  "quick_cache",
  "rustc-hash",
  "self_cell",
@@ -550,6 +544,12 @@ name = "memchr"
 version = "2.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273"
+
+[[package]]
+name = "mutants"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc0287524726960e07b119cebd01678f852f147742ae0d925e6a520dca956126"
 
 [[package]]
 name = "once_cell"
