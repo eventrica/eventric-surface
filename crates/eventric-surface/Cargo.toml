@@ -1,6 +1,4 @@
 [dependencies]
-eventric-core.workspace           = true
-eventric-stream.workspace         = true
 eventric-surface-core.workspace   = true
 eventric-surface-macros.workspace = true
 

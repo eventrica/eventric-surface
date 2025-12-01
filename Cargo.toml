@@ -12,7 +12,6 @@ resolver = "2"
 assertables             = { version = "9" }
 darling                 = { version = "0.21" }
 derive_more             = { version = "2", features = ["full"] }
-eventric-core           = { git = "https://github.com/eventrica/eventric-core.git" }
 eventric-stream         = { git = "https://github.com/eventrica/eventric-stream.git" }
 eventric-surface        = { path = "crates/eventric-surface" }
 eventric-surface-core   = { path = "crates/eventric-surface-core" }

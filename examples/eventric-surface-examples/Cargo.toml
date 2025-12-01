@@ -1,6 +1,5 @@
 [dependencies]
 derive_more.workspace       = true
-eventric-core.workspace     = true
 eventric-stream.workspace   = true
 eventric-surface.workspace  = true
 fancy_constructor.workspace = true

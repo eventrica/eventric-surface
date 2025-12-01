@@ -184,17 +184,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "eventric-core"
-version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-core.git#c76a28710ecfa415672842a5fbe15a7079b5543d"
-dependencies = [
- "thiserror",
-]
-
-[[package]]
 name = "eventric-stream"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-stream.git#09d0c7ba53aa2f92c8d979abbe5b90e1942cdfd7"
+source = "git+https://github.com/eventrica/eventric-stream.git#e64239c59375a726c2b1e2faa1b3bcbf4f6ca2ac"
 dependencies = [
  "eventric-stream-core",
  "eventric-stream-macros",
@@ -204,13 +196,13 @@ dependencies = [
 [[package]]
 name = "eventric-stream-core"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-stream.git#09d0c7ba53aa2f92c8d979abbe5b90e1942cdfd7"
+source = "git+https://github.com/eventrica/eventric-stream.git#e64239c59375a726c2b1e2faa1b3bcbf4f6ca2ac"
 dependencies = [
  "bytes",
  "dashmap",
  "derive_more",
  "double-ended-peekable",
- "eventric-core",
+ "eventric-utils",
  "fancy_constructor",
  "fjall",
  "rand",
@@ -222,7 +214,7 @@ dependencies = [
 [[package]]
 name = "eventric-stream-macros"
 version = "0.1.0"
-source = "git+https://github.com/eventrica/eventric-stream.git#09d0c7ba53aa2f92c8d979abbe5b90e1942cdfd7"
+source = "git+https://github.com/eventrica/eventric-stream.git#e64239c59375a726c2b1e2faa1b3bcbf4f6ca2ac"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -234,8 +226,6 @@ dependencies = [
 name = "eventric-surface"
 version = "0.1.0"
 dependencies = [
- "eventric-core",
- "eventric-stream",
  "eventric-surface-core",
  "eventric-surface-macros",
 ]
@@ -257,7 +247,6 @@ name = "eventric-surface-examples"
 version = "0.1.0"
 dependencies = [
  "derive_more",
- "eventric-core",
  "eventric-stream",
  "eventric-surface",
  "fancy_constructor",
@@ -275,6 +264,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "eventric-utils"
+version = "0.1.0"
+source = "git+https://github.com/eventrica/eventric-utils.git#6aad1d7795920a758e8966d6958069f08399907e"
+dependencies = [
+ "thiserror",
 ]
 
 [[package]]
