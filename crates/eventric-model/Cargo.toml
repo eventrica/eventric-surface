@@ -1,0 +1,18 @@
+[dependencies]
+eventric-model-core.workspace   = true
+eventric-model-macros.workspace = true
+
+[lints]
+workspace = true
+
+[package]
+authors.workspace    = true
+categories.workspace = true
+description          = "Eventric Model"
+edition.workspace    = true
+keywords.workspace   = true
+license.workspace    = true
+name                 = "eventric-model"
+readme.workspace     = true
+repository.workspace = true
+version.workspace    = true
