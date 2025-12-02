@@ -9,7 +9,6 @@ pub mod action {
         Act,
         Action,
         Context,
-        Events,
         Select,
         Update,
     };
@@ -19,6 +18,7 @@ pub mod action {
 pub mod event {
     pub use eventric_model_core::event::{
         Event,
+        Events,
         Identifier,
         Specifier,
         Tags,
@@ -30,11 +30,11 @@ pub mod projection {
     pub use eventric_model_core::projection::{
         Dispatch,
         DispatchEvent,
+        Project,
         Projection,
+        ProjectionEvent,
         Recognize,
         Select,
-        Update,
-        UpdateEvent,
     };
     pub use eventric_model_macros::Projection;
 }

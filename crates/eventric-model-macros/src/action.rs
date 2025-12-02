@@ -81,13 +81,13 @@ impl Action {
 
             #[derive(Debug)]
             pub struct #context_type {
-                pub events: eventric_model::action::Events,
+                pub events: eventric_model::event::Events,
                 #(pub #context_field_name: #context_field_type),*
             }
 
             #[automatically_derived]
             impl ::std::ops::Deref for #context_type {
-                type Target = eventric_model::action::Events;
+                type Target = eventric_model::event::Events;
 
                 fn deref(&self) -> &Self::Target {
                     &self.events
@@ -102,8 +102,8 @@ impl Action {
             }
 
             #[automatically_derived]
-            impl ::core::convert::Into<::eventric_model::action::Events> for #context_type {
-                fn into(self) -> ::eventric_model::action::Events {
+            impl ::core::convert::Into<::eventric_model::event::Events> for #context_type {
+                fn into(self) -> ::eventric_model::event::Events {
                     self.events
                 }
             }
@@ -111,7 +111,7 @@ impl Action {
             impl #context_type {
                 pub fn new(action: &#ident) -> Self {
                     Self {
-                        events: eventric_model::action::Events::new(),
+                        events: eventric_model::event::Events::new(),
                         #(#context_field_init),*
                     }
                 }

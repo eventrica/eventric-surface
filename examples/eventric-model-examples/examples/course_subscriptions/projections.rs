@@ -1,8 +1,8 @@
 use derive_more::Debug;
 use eventric_model::projection::{
+    Project,
     Projection,
-    Update,
-    UpdateEvent,
+    ProjectionEvent,
 };
 use fancy_constructor::new;
 
@@ -32,8 +32,8 @@ pub struct CourseExists {
     pub id: String,
 }
 
-impl Update<CourseDefined> for CourseExists {
-    fn update(&mut self, _: UpdateEvent<'_, CourseDefined>) {
+impl Project<CourseDefined> for CourseExists {
+    fn project(&mut self, _: ProjectionEvent<'_, CourseDefined>) {
         self.exists = true;
     }
 }
@@ -52,14 +52,14 @@ pub struct CourseCapacity {
     pub id: String,
 }
 
-impl Update<CourseDefined> for CourseCapacity {
-    fn update(&mut self, event: UpdateEvent<'_, CourseDefined>) {
+impl Project<CourseDefined> for CourseCapacity {
+    fn project(&mut self, event: ProjectionEvent<'_, CourseDefined>) {
         self.capacity = event.capacity;
     }
 }
 
-impl Update<CourseCapacityChanged> for CourseCapacity {
-    fn update(&mut self, event: UpdateEvent<'_, CourseCapacityChanged>) {
+impl Project<CourseCapacityChanged> for CourseCapacity {
+    fn project(&mut self, event: ProjectionEvent<'_, CourseCapacityChanged>) {
         self.capacity = event.new_capacity;
     }
 }
@@ -80,8 +80,8 @@ pub struct StudentAlreadySubscribed {
     pub student_id: String,
 }
 
-impl Update<StudentSubscribedToCourse> for StudentAlreadySubscribed {
-    fn update(&mut self, _: UpdateEvent<'_, StudentSubscribedToCourse>) {
+impl Project<StudentSubscribedToCourse> for StudentAlreadySubscribed {
+    fn project(&mut self, _: ProjectionEvent<'_, StudentSubscribedToCourse>) {
         self.subscribed = true;
     }
 }
@@ -100,8 +100,8 @@ pub struct NumberOfCourseSubscriptions {
     pub count: u8,
 }
 
-impl Update<StudentSubscribedToCourse> for NumberOfCourseSubscriptions {
-    fn update(&mut self, _: UpdateEvent<'_, StudentSubscribedToCourse>) {
+impl Project<StudentSubscribedToCourse> for NumberOfCourseSubscriptions {
+    fn project(&mut self, _: ProjectionEvent<'_, StudentSubscribedToCourse>) {
         self.count += 1;
     }
 }
@@ -120,8 +120,8 @@ pub struct NumberOfStudentSubscriptions {
     pub count: u8,
 }
 
-impl Update<StudentSubscribedToCourse> for NumberOfStudentSubscriptions {
-    fn update(&mut self, _: UpdateEvent<'_, StudentSubscribedToCourse>) {
+impl Project<StudentSubscribedToCourse> for NumberOfStudentSubscriptions {
+    fn project(&mut self, _: ProjectionEvent<'_, StudentSubscribedToCourse>) {
         self.count += 1;
     }
 }

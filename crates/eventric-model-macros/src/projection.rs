@@ -69,7 +69,7 @@ impl Projection {
         let dispatch_trait = format_ident!("{ident}Dispatch");
 
         quote! {
-            pub trait #dispatch_trait: #(::eventric_model::projection::Update<#event>)+* {}
+            pub trait #dispatch_trait: #(::eventric_model::projection::Project<#event>)+* {}
 
             #[automatically_derived]
             impl #dispatch_trait for #ident {}
@@ -78,7 +78,7 @@ impl Projection {
             impl ::eventric_model::projection::Dispatch for #ident {
                 fn dispatch(&mut self, event: &::eventric_model::projection::DispatchEvent) {
                     match event {
-                      #(_ if let std::option::Option::Some(event) = event.as_update_event::<#event>() => self.update(event),)*
+                      #(_ if let std::option::Option::Some(event) = event.as_projection_event::<#event>() => self.project(event),)*
                         _ => {}
                     }
                 }
