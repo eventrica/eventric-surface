@@ -168,10 +168,10 @@ impl Action {
                             )?;
                         }
 
-                        if event.mask()[#context_field_index] && let Some(dispatch_event) = dispatch_event {
+                        if event.mask()[#context_field_index] && let Some(dispatch_event) = dispatch_event.as_ref() {
                             ::eventric_model::projection::Dispatch::dispatch(
                                 &mut context.#context_field_name,
-                                &dispatch_event,
+                                dispatch_event,
                             );
                         }
                     })*
