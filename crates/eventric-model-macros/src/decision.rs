@@ -124,22 +124,17 @@ impl Decision {
 
         quote! {
             impl ::eventric_model::decision::Update for #ident {
-                fn update<C>(
+                fn update(
                     &self,
-                    codec: ::std::sync::Arc<C>,
                     event: &::eventric_stream::stream::select::EventMasked,
                     projections: &mut Self::Projections
-                ) -> ::std::result::Result<(), ::eventric_stream::error::Error>
-                where
-                    C: ::eventric_model::event::Codec,
-                {
+                ) -> ::std::result::Result<(), ::eventric_stream::error::Error> {
                     let mut dispatch_event = None;
 
                     #({
                         if event.mask()[#proj_index] && dispatch_event.is_none() {
                             dispatch_event = ::eventric_model::projection::Recognize::recognize(
                                 &projections.#proj_field_name,
-                                codec,
                                 event,
                             )?;
                         }

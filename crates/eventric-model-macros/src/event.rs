@@ -58,11 +58,11 @@ impl Event {
     }
 
     fn identifier(&self) -> TokenStream {
-        let event_type = &self.ident;
+        let ident = &self.ident;
         let identifier = &self.identifier;
 
         quote! {
-            impl ::eventric_model::event::Identifier for #event_type {
+            impl ::eventric_model::event::Identifier for #ident {
                 fn identifier() -> ::std::result::Result<
                     &'static ::eventric_stream::event::Identifier,
                     ::eventric_stream::error::Error

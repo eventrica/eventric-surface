@@ -1,26 +1,15 @@
-use std::sync::Arc;
-
 use eventric_stream::{
     error::Error,
     stream::select::EventMasked,
 };
 
-use crate::{
-    decision::projections::Projections,
-    event::codec::Codec,
-};
+use crate::decision::projections::Projections;
 
 // =================================================================================================
 // Update
 // =================================================================================================
 
 pub trait Update: Projections {
-    fn update<C>(
-        &self,
-        codec: Arc<C>,
-        event: &EventMasked,
-        projections: &mut Self::Projections,
-    ) -> Result<(), Error>
-    where
-        C: Codec;
+    fn update(&self, event: &EventMasked, projections: &mut Self::Projections)
+    -> Result<(), Error>;
 }

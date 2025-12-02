@@ -198,6 +198,7 @@ dependencies = [
  "derive_more",
  "eventric-stream",
  "fancy_constructor",
+ "revision",
  "serde",
  "serde_json",
  "thiserror",
@@ -211,6 +212,7 @@ dependencies = [
  "eventric-model",
  "eventric-stream",
  "fancy_constructor",
+ "revision",
  "serde",
  "serde_json",
 ]
@@ -666,6 +668,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed2bf2547551a7053d6fdfafda3f938979645c44812fbfcda098faae3f1a362d"
 dependencies = [
  "bitflags",
+]
+
+[[package]]
+name = "revision"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1afd502a7bd15659a0b81479de42a249afa2dd3bdcc689871d6da4b3d005018d"
+dependencies = [
+ "bytes",
+ "revision-derive",
+]
+
+[[package]]
+name = "revision-derive"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "400e8b48caaca9faa40f590f643c5c155d6c8700378e700de1bd8f453e11578d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

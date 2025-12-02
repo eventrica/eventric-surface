@@ -1,7 +1,4 @@
-use std::{
-    any::Any,
-    sync::Arc,
-};
+use std::any::Any;
 
 use eventric_stream::{
     error::Error,
@@ -15,10 +12,7 @@ use eventric_stream::{
 use fancy_constructor::new;
 
 use crate::{
-    event::{
-        Codec,
-        Event,
-    },
+    event::Event,
     projection::update::UpdateEvent,
 };
 
@@ -54,13 +48,12 @@ impl DispatchEvent {
             .map(|inner_event| UpdateEvent::new(inner_event, self.position, self.timestamp))
     }
 
-    pub fn from_event<C, E>(codec: &Arc<C>, event: &event::Event) -> Result<Self, Error>
+    pub fn from_event<E>(event: &event::Event) -> Result<Self, Error>
     where
-        C: Codec,
         E: Event + 'static,
     {
-        codec
-            .decode::<E>(event)
+        revision::from_slice::<E>(event.data().as_ref())
+            .map_err(|_| Error::data("deserialization error"))
             .map(|inner_event| Box::new(inner_event) as Box<dyn Any>)
             .map(|inner_event| {
                 Self::new(

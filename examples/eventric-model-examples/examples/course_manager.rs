@@ -6,8 +6,6 @@
 #![feature(once_cell_try)]
 #![feature(if_let_guard)]
 
-use std::sync::Arc;
-
 use derive_more::Debug;
 use eventric_model::{
     decision::{
@@ -15,11 +13,7 @@ use eventric_model::{
         Events,
         Execute,
     },
-    event::{
-        Codec,
-        Event,
-        json,
-    },
+    event::Event,
     projection::{
         Projection,
         Update,
@@ -35,6 +29,7 @@ use eventric_stream::{
     },
 };
 use fancy_constructor::new;
+use revision::revisioned;
 use serde::{
     Deserialize,
     Serialize,
@@ -46,6 +41,7 @@ use serde::{
 
 // Events
 
+#[revisioned(revision = 1)]
 #[derive(new, Debug, Deserialize, Event, Serialize)]
 #[event(identifier(course_registered), tags(course(&this.id)))]
 pub struct CourseRegistered {
@@ -56,6 +52,7 @@ pub struct CourseRegistered {
     pub capacity: u8,
 }
 
+#[revisioned(revision = 1)]
 #[derive(new, Debug, Deserialize, Event, Serialize)]
 #[event(identifier(course_withdrawn), tags(course(&this.id)))]
 pub struct CourseWithdrawn {
@@ -99,16 +96,13 @@ pub struct RegisterCourse {
 }
 
 impl Execute for RegisterCourse {
-    fn execute<C>(
+    fn execute(
         &mut self,
-        context: &mut Events<C>,
+        events: &mut Events,
         projections: &Self::Projections,
-    ) -> Result<(), Error>
-    where
-        C: Codec,
-    {
+    ) -> Result<(), Error> {
         if !projections.course_exists.exists {
-            context.append(CourseRegistered::new(&self.id, &self.title, self.capacity))?;
+            events.append(&CourseRegistered::new(&self.id, &self.title, self.capacity))?;
         }
 
         Ok(())
@@ -120,18 +114,11 @@ impl Execute for RegisterCourse {
 // Experimental...
 
 #[derive(new, Debug)]
-pub struct DecisionContext<'a, C>
-where
-    C: Codec,
-{
-    codec: Arc<C>,
+pub struct DecisionContext<'a> {
     stream: &'a mut Stream,
 }
 
-impl<C> DecisionContext<'_, C>
-where
-    C: Codec,
-{
+impl DecisionContext<'_> {
     pub fn execute<D>(&mut self, mut decision: D) -> Result<(), Error>
     where
         D: Decision,
@@ -145,17 +132,14 @@ where
 
         for event in events {
             let event = event?;
-            let codec = self.codec.clone();
             let position = *event.position();
 
             after = Some(position);
 
-            decision.update(codec, &event, &mut projections)?;
+            decision.update(&event, &mut projections)?;
         }
 
-        let codec = self.codec.clone();
-
-        let mut events = Events::new(codec);
+        let mut events = Events::new();
 
         decision.execute(&mut events, &projections)?;
 
@@ -174,10 +158,8 @@ where
 // Temporary Example Logic...
 
 pub fn main() -> Result<(), Error> {
-    let codec = Arc::new(json::Codec);
-
     let mut stream = Stream::builder("./temp").temporary(false).open()?;
-    let mut context = DecisionContext::new(codec, &mut stream);
+    let mut context = DecisionContext::new(&mut stream);
 
     context.execute(RegisterCourse::new("my_course", "My Course", 30))
 }

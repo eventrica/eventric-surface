@@ -7,8 +7,8 @@
 pub mod decision {
     pub use eventric_model_core::decision::{
         Decision,
-        Execute,
         Events,
+        Execute,
         Projections,
         Select,
         Update,
@@ -18,17 +18,13 @@ pub mod decision {
 
 pub mod event {
     pub use eventric_model_core::event::{
-        Codec,
         Event,
         Identifier,
         Specifier,
         Tags,
+        revisioned,
     };
     pub use eventric_model_macros::Event;
-
-    pub mod json {
-        pub use eventric_model_core::event::JsonCodec as Codec;
-    }
 }
 
 pub mod projection {

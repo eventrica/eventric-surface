@@ -2,6 +2,7 @@
 derive_more.workspace       = true
 eventric-stream.workspace   = true
 fancy_constructor.workspace = true
+revision.workspace          = true
 serde.workspace             = true
 serde_json.workspace        = true
 thiserror.workspace         = true

@@ -1,17 +1,16 @@
-use std::sync::Arc;
-
 use eventric_stream::{
     error::Error,
-    event::CandidateEvent,
+    event::{
+        CandidateEvent,
+        Data,
+        Version,
+    },
 };
 use fancy_constructor::new;
 
 use crate::{
     decision::Projections,
-    event::{
-        Codec,
-        Event,
-    },
+    event::Event,
 };
 
 // =================================================================================================
@@ -19,34 +18,32 @@ use crate::{
 // =================================================================================================
 
 pub trait Execute: Projections {
-    fn execute<C>(
+    fn execute(
         &mut self,
-        events: &mut Events<C>,
+        events: &mut Events,
         projections: &Self::Projections,
-    ) -> Result<(), Error>
-    where
-        C: Codec;
+    ) -> Result<(), Error>;
 }
 
 #[derive(new, Debug)]
-pub struct Events<C>
-where
-    C: Codec,
-{
-    codec: Arc<C>,
+pub struct Events {
     #[new(default)]
     events: Vec<CandidateEvent>,
 }
 
-impl<C> Events<C>
-where
-    C: Codec,
-{
-    pub fn append<E>(&mut self, event: E) -> Result<(), Error>
+impl Events {
+    pub fn append<E>(&mut self, event: &E) -> Result<(), Error>
     where
         E: Event,
     {
-        let event = self.codec.encode(event)?;
+        let data = revision::to_vec(event).map_err(|_| Error::data("serialization error"))?;
+        let data = Data::new(data)?;
+
+        let identifier = E::identifier().cloned()?;
+        let tags = event.tags()?;
+        let version = Version::default();
+
+        let event = CandidateEvent::new(data, identifier, tags, version);
 
         self.events.push(event);
 
