@@ -22,7 +22,6 @@ pub mod event {
         Identifier,
         Specifier,
         Tags,
-        revisioned,
     };
     pub use eventric_model_macros::Event;
 }

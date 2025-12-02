@@ -21,8 +21,6 @@ pub trait Event: DeserializeRevisioned + Identifier + Tags + SerializeRevisioned
 
 // Re-Exports
 
-pub use revision::revisioned;
-
 pub use self::{
     identifier::Identifier,
     specifier::Specifier,

@@ -21,8 +21,6 @@ heck                  = { version = "0.5" }
 proc-macro2           = { version = "1" }
 quote                 = { version = "1" }
 revision              = { version = "0.15" }
-serde                 = { version = "1", features = ["derive"] }
-serde_json            = { version = "1" }
 syn                   = { version = "2", features = ["derive"] }
 thiserror             = { version = "2" }
 

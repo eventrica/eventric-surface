@@ -30,10 +30,6 @@ use eventric_stream::{
 };
 use fancy_constructor::new;
 use revision::revisioned;
-use serde::{
-    Deserialize,
-    Serialize,
-};
 
 // =================================================================================================
 // Course Manager
@@ -42,7 +38,7 @@ use serde::{
 // Events
 
 #[revisioned(revision = 1)]
-#[derive(new, Debug, Deserialize, Event, Serialize)]
+#[derive(new, Debug, Event)]
 #[event(identifier(course_registered), tags(course(&this.id)))]
 pub struct CourseRegistered {
     #[new(into)]
@@ -53,7 +49,7 @@ pub struct CourseRegistered {
 }
 
 #[revisioned(revision = 1)]
-#[derive(new, Debug, Deserialize, Event, Serialize)]
+#[derive(new, Debug, Event)]
 #[event(identifier(course_withdrawn), tags(course(&this.id)))]
 pub struct CourseWithdrawn {
     #[new(into)]
