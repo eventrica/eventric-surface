@@ -38,3 +38,7 @@ pub mod projection {
     };
     pub use eventric_model_macros::Projection;
 }
+
+pub mod stream {
+    pub use eventric_model_core::stream::Executor;
+}

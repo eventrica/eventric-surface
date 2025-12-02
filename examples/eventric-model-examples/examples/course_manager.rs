@@ -18,14 +18,11 @@ use eventric_model::{
         Update,
         UpdateEvent,
     },
+    stream::Executor as _,
 };
 use eventric_stream::{
     error::Error,
-    stream::{
-        Stream,
-        append::AppendSelect as _,
-        iterate::IterateSelect as _,
-    },
+    stream::Stream,
 };
 use fancy_constructor::new;
 use revision::revisioned;
@@ -95,9 +92,13 @@ impl Execute for RegisterCourse {
     type Ok = ();
 
     fn execute(&mut self, context: &mut Self::Context) -> Result<Self::Ok, Self::Err> {
-        if !context.course_exists.exists {
-            context.append(&CourseRegistered::new(&self.id, &self.title, self.capacity))?;
+        if context.course_exists.exists {
+            return Err(Error::data("course already exists!"));
         }
+
+        let event = CourseRegistered::new(&self.id, &self.title, self.capacity);
+
+        context.append(&event)?;
 
         Ok(())
     }
@@ -105,52 +106,15 @@ impl Execute for RegisterCourse {
 
 // -------------------------------------------------------------------------------------------------
 
-// Experimental...
-
-#[derive(new, Debug)]
-pub struct DecisionContext<'a> {
-    stream: &'a mut Stream,
-}
-
-impl DecisionContext<'_> {
-    pub fn execute<D>(&mut self, mut decision: D) -> Result<D::Ok, D::Err>
-    where
-        D: Decision,
-    {
-        let mut after = None;
-        let mut context = decision.context();
-
-        let selections = decision.select(&context)?;
-
-        let (events, select) = self.stream.iter_select(selections, None);
-
-        for event in events {
-            let event = event?;
-            let position = *event.position();
-
-            after = Some(position);
-
-            decision.update(&mut context, &event)?;
-        }
-
-        let ok = decision.execute(&mut context)?;
-        let events = context.into().take();
-
-        if !events.is_empty() {
-            self.stream.append_select(events, select, after)?;
-        }
-
-        Ok(ok)
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-// Temporary Example Logic...
+// Example
 
 pub fn main() -> Result<(), Error> {
-    let mut stream = Stream::builder("./temp").temporary(false).open()?;
-    let mut context = DecisionContext::new(&mut stream);
+    let mut stream = Stream::builder("./temp").open()?;
 
-    context.execute(RegisterCourse::new("my_course", "My Course", 30))
+    let decision = RegisterCourse::new("my_course", "My Course Title", 30);
+    let decision_result = stream.execute(decision);
+
+    println!("Decision executed with result: {decision_result:?}");
+
+    Ok(())
 }

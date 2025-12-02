@@ -11,6 +11,7 @@ pub mod decision;
 pub mod error;
 pub mod event;
 pub mod projection;
+pub mod stream;
 
 // =================================================================================================
 // Eventric Surface Core
